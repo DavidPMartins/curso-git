@@ -1,0 +1,464 @@
+/*           PIM ADS Pinheiros dez/2018 Grupo: 4
+
+ 
+
+                Participantes --------------------------------------------------------------------
+
+                Nome[0]: André Soares da Silva Rodrigues        RA[0]:  N273054          Turma (1º/2º Sem)[0]:  2º Sem
+
+                Nome[1]: David Pereira Martins                  RA[1]:  N2457H-5         Turma (1º/2º Sem)[1]:  2º Sem
+
+                Nome[2]: Eduarda de Oliveira Lima               RA[2]:  N367CC-0         Turma (1º/2º Sem)[2]:  1º Sem
+
+                Nome[3]: Mateus da Silva Rodrigues de Oliveira  RA[3]:  N33406-1         Turma (1º/2º Sem)[3]:  2º Sem
+
+                Nome[4]: Nicolas Alves de Andrade               RA[4]:  D7069J-0         Turma (1º/2º Sem)[4]: 	2º Sem
+				
+				Nome[5]: Thiago de Andrade Brasiliano           RA[5]:  D7001F1          Turma (1º/2º Sem)[4]: 	2º Sem
+
+ 
+                Outras Observacoes -----------------------------------------------------------
+
+                Coloque aqui, se houver
+
+*/
+
+
+
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <time.h>
+#define	LIN 10
+#define COL 10
+
+using namespace std;
+
+//FUNÇÕES
+void Menu();
+
+//CADASTRO E VERIFICAÇÃO DE DEFICIENTE E/OU PROFESSOR/CONVIDADO
+void Cadastro(); 
+void pesquisaCadastro(); 
+void listarCadastro(); 
+
+//verifica cadeiras, emissão de ticket e sorteio. 
+
+void listarCadeiras();
+void escolherCadeiras();
+void verificaCadeira(int, int); 
+void sorteio();
+int numSorteado(); 
+void emitirTicket(string);
+
+
+//STRUCTS
+struct Clientes {
+	string cpf;
+	string email;
+	string nome;
+	string sobrenome;
+	int clienteCadastrado;
+	int cadeira;
+	char verificaSN;
+	string deficiente;
+	string professor;
+	string convidado;
+};
+//CONSTANTES
+const int PARTICIPANTES = 100;
+
+
+void inicializa(char matriz[LIN][COL]);
+char matriz[LIN][COL];
+
+//VARIAVEIS GLOBAIS
+bool sair = true; 
+int op; //opção para os menus
+Clientes cliente[PARTICIPANTES]; 
+bool cadastrado = false; 
+bool cadeiras[LIN][COL];
+int lin, col;
+bool cadastrodireto = false;
+bool cadeiralivre = false;
+bool convidado = false;
+bool deficiente = false;
+int colunaY();
+int linhaX();
+
+
+int main() {
+	while (sair) {
+		Menu();
+	}
+	return 0;
+}
+
+//MENU PRINCIPAL
+void Menu() {
+	setlocale(LC_ALL, "Portuguese");
+	system("cls"); //system("cls"); - LIMPAR A TELA
+	printf("\n\t Seja bem vindo, para fazer o cadastro é preciso ter o cpf em mãos!!\n\t");
+	
+	printf("\n\t 			1 - Cadastro\n\t");
+			
+	printf("\n\t 			2 - Pesquisar Cadastro\n\t");
+		
+	printf("\n\t 			3 - Listar Cadastros\n\t");
+		
+	printf("\n\t 			4 - Listar Cadeiras\n\t");
+					
+	printf("\n\t 			5 - Sorteio\n\t");
+		
+	printf("\n\t 			6 - Sair\n\t");
+		
+	printf("\n\tDigite a opção desejada: ");
+	scanf("%d", &op);
+	switch (op) {
+	case 1:
+		Cadastro();
+		listarCadeiras();
+		break;
+	case 2:
+		pesquisaCadastro();
+		break;
+	case 3:
+		listarCadastro();
+		break;
+	case 4:
+		cadastrodireto = false;
+		listarCadeiras();
+		break;
+	case 5:
+		sorteio();
+		break;
+	case 6:
+		printf("Obrigado!!");
+		sair = false;
+		break;
+	default:
+		printf("Opção inválida!");
+		break;
+	
+	}
+}
+
+// Inicia a matriz com valor 0
+void inicializa(char matriz[LIN][COL]){
+     int i,j;
+     for(i=1;i<=LIN;i++)
+       for(j=1;j<=COL;j++)
+          matriz[i][j] = '.';
+}
+//CADASTRO DO PARTICIPANTE
+void Cadastro() {
+	int i = 0, opticket = 0;
+	system("cls");
+	cadastrodireto = true;
+	convidado = false;
+	deficiente = false;
+//	pesquisaCadastro();
+	for (int i = 0; i <= PARTICIPANTES; i++) {
+		cadastrado = false;
+		if (cliente[i].clienteCadastrado != 1) {
+			cout << "\n\tCADASTRO\n";
+			cout << "\nNome: ";
+			cin >> cliente[i].nome;
+			cout << "\nSobrenome: ";
+			cin >> cliente[i].sobrenome;
+			cout << "\nEmail: ";
+			cin >> cliente[i].email;
+			cout << "\nCPF: ";
+			cin >> cliente[i].cpf;
+			cout << "\nParticipante é um convidado? s/n: ";
+			cin >> cliente[i].verificaSN;
+			//Verifica se o participante é um convidado
+			if (cliente[i].verificaSN == 's' || cliente[i].verificaSN == 'S')
+ {
+				cliente[i].convidado = "SIM";
+				convidado = true;
+			}
+			else {
+				cliente[i].convidado = "NAO";
+			}
+			cout << "\nParticipante é um professor? s/n: ";
+			cin >> cliente[i].verificaSN;
+			//Verifica se o participante é um professor
+			if (cliente[i].verificaSN == 's' || cliente[i].verificaSN == 'S') {
+				cliente[i].professor = "SIM";
+				convidado = true;
+			}
+			else {
+				cliente[i].professor = "NAO";
+			}
+			cout << "\nParticipante possuí alguma deficiencia? s/n: ";
+			cin >> cliente[i].verificaSN;
+			//Verifica se o participante possui deficiencia
+			if (cliente[i].verificaSN == 's' || cliente[i].verificaSN == 'S') {
+				cliente[i].deficiente = "SIM";
+				deficiente = true;
+			}
+			else {
+				cliente[i].deficiente = "NAO";
+			}
+
+			cliente[i].clienteCadastrado = 1;
+			escolherCadeiras();
+			lin *= 10;
+			cliente[i].cadeira = lin + col;
+			cout << "\nCadastro realizado com sucesso!!!\n\nDigite 1 para emitir o Ticket!!: ";
+			cin >> opticket;
+			if (opticket == 1) {
+				emitirTicket(cliente[i].cpf);
+				cadastrado = true;
+			}
+		}
+		if (cadastrado) {
+			break;
+		}
+	}
+	cout << "\nDigite 1 para novo cadastro, ou 2 para voltar ao menu: ";
+	cin >> op;
+	if (op == 1) {
+		Cadastro();
+	}
+	else {
+		Menu();
+	}
+	
+}
+
+//* PESQUISA DE CADASTRO*
+void pesquisaCadastro() {
+	system("cls");
+	string pesquisacpf;
+	string pesquisaemail;
+	int pesquisacadeira;
+	bool invalido = false;
+
+	do {
+		invalido = false;
+		cout << "\n\tPESQUISAR CADASTRO\n";
+		cout << "\nDigite 1 para pesquisa por CPF, 2 para pesquisa por email: ";
+		cin >> op;
+
+		switch (op) {
+		case 1: //Pesquisa por CPF
+			cout << "\nDigite o CPF: ";
+			cin >> pesquisacpf;
+
+			for (int i = 0; i < PARTICIPANTES; i++) {
+				if (cliente[i].cpf == pesquisacpf) {
+					cout << "\nNome: " << cliente[i].nome << "\nSobrenome:" << cliente[i].sobrenome << "\nEmail: " << cliente[i].email << "\nCPF: " << cliente[i].cpf << "\nDeficiente: " << cliente[i].deficiente << "\nProfessor: " << cliente[i].professor << "\nConvidado: " << cliente[i].convidado << "\nCadeira: " << cliente[i].cadeira << "\n";
+					cout << "\nParticipante já cadastrado";
+					//cadastrado = true;
+				}
+			}
+			break;
+
+		case 2: //Pesquisa por Email
+			cout << "\nDigite o email: ";
+			cin >> pesquisaemail;
+
+			for (int i = 0; i < PARTICIPANTES; i++) {
+				if (cliente[i].email == pesquisaemail) {
+					cout << "\nNome: " << cliente[i].nome << "\nSobrenome:" << cliente[i].sobrenome << "\nEmail: " << cliente[i].email << "\nCPF: " << cliente[i].cpf << "\nDeficiente: " << cliente[i].deficiente << "\nProfessor: " << cliente[i].professor << "\nConvidado: " << cliente[i].convidado << "\nCadeira: " << cliente[i].cadeira << "\n";
+					cout << "\nParticipante já cadastrado";
+					//cadastrado = true;
+				}
+			}
+			break;
+		default:
+			cout << "\nOpção inválida!";
+			invalido = true;
+			break;
+		}
+		if (invalido == false && cadastrodireto == true) 
+{
+			cout << "\nCliente não cadastrado!";
+			cout << "\nDigite 1 para nova pesquisa, ou 2 para cadastrar: ";
+			cin >> op;
+		}
+		else 
+{
+			cout << "\nDigite 1 para nova pesquisa, ou 2 para voltar ao menu: ";
+			cin >> op;
+			if (op == 2) {
+				Menu();
+			}
+		}
+	} while (op == 1);
+}
+
+//LISTAR CADASTROS
+void listarCadastro() {
+	system("cls");
+	cout << "\n\tLISTA DE PARTICIPANTES\n";
+
+	for (int i = 0; i < PARTICIPANTES; i++) {
+		if (cliente[i].clienteCadastrado == 1) 
+{
+			cout << "\nNome: " << cliente[i].nome << "\nSonrenome:" << cliente[i].sobrenome << "\nEmail: " << cliente[i].email << "\nCPF: " << cliente[i].cpf << "\nDeficiente: " << cliente[i].deficiente << "\nProfessor: " << cliente[i].professor << "\nConvidado: " << cliente[i].convidado << "\nCadeira: " << cliente[i].cadeira << "\n";
+		}
+	}
+	cout << "\nDigite qualquer caractere para voltar ao menu: ";
+	cin >> op;
+}
+
+//Lista as cadeiras e dá a opção de reserva
+void escolherCadeiras() {
+	inicializa(matriz);
+	listarCadeiras();
+	int i,j;
+    cout << "\n\n         RESERVA DE CADEIRAS\n\n";
+    lin = linhaX();
+    col = colunaY();
+   
+   verificaCadeira(lin, col);
+   
+   if(matriz[lin][col]=='.'){
+   		matriz[lin][col] = 'X';
+				
+	}
+   if (cadeiralivre == true && lin < 2 && convidado == true) {
+		cadeiras[lin][col] = 1;
+		
+	}
+	else if (lin < 2 && convidado == false){
+		cout << "\nCadeira exclusiva para convidado!!\n\nDigite 1 para escolher outra: ";
+		cin >> op;
+		escolherCadeiras();
+	}
+	else if (deficiente == true && cadeiralivre == true && lin == 10 && (col == 1 || col == 2 || col == 3 || col == 4 || col == 5)) {
+		cadeiras[lin][col] = 1;
+	}
+	else if (deficiente == false && cadeiralivre == true && lin == 10 && (col == 1 || col == 2 || col == 3 || col == 4 || col == 5)) {
+		cout << "\nCadeira exclusiva para deficientes!!\n\nDigite 1 para escolher outra: ";
+		cin >> op;
+		escolherCadeiras();
+	}
+	else if (cadeiralivre == true && lin >= 2 && (col != 0 || col != 1 || col != 2 || col != 8 || col != 9)) {
+		cadeiras[lin][col] = 1;
+	}
+	else {
+		cout << "\nCadeira ocupada, escolha outra\n\nDigite 1 para escolher outra: ";
+		cin >> op;
+		escolherCadeiras();
+	}
+}
+
+//LISTAR CARDEIRAS
+void listarCadeiras() {
+	inicializa(matriz);
+	int i, j;
+	lin = '.';
+	col = '.';
+	system("cls");
+	cout << "\nSELECAO DE CADEIRAS\n";
+	for(i=1;i<=COL;i++)
+    printf("\t%d      ",i);
+  
+  for(i=1;i<=LIN;i++){
+     printf("\n\n  %d",i);
+     for(j=1;j<=COL;j++)
+     	printf("     (%c)",matriz[i][j]);
+     	if (cadeiras[i][j] == 0) {
+				
+			}
+			else if (cadeiras[i][j] == 1){
+				cout << "X";
+			}
+			if (j == 9) {
+				cout << "\n";
+			}
+		}
+	
+	if (cadastrodireto == false) {
+		cout << "\n\nDigite 1 para sair: ";
+		cin >> op;
+	}
+}
+
+//Emite o ticket com Nome, CPF, Cadeira e se é participante, professor ou deficiente
+void emitirTicket(string cpf) {
+	system("cls");
+
+	for (int i = 0; i < PARTICIPANTES; i++) {
+		if (cliente[i].cpf == cpf) {
+			cout << "\n\tTICKET\n" << "\nNome: " << cliente[i].nome << "\nSobrenome: " << cliente[i].sobrenome << "\nCPF: " << cliente[i].cpf << "\nDeficiente: " << cliente[i].deficiente << "\nProfessor: " << cliente[i].professor << "\nConvidado: " << cliente[i].convidado << "\nCadeira: " << cliente[i].cadeira << "\nWiFi: palestraONU" << "\nSenha:palestraONU" <<"\n";
+		}
+	}
+	if (cadastrodireto == false) {
+		cout << "\n\nDigite 1 para sair: ";
+		cin >> op;
+	}
+}
+void reservaCadeiraDeficiente()
+{
+	
+}
+
+//Verifica se a cadeira está ocupada
+void verificaCadeira(int lin, int col) {
+	for (int i = 0; i <= LIN; i++) {
+		for (int j = 0; j <= COL; j++) {
+			if (cadeiras[i][j] == 0 && cadeiras[lin][col] == 0) {
+				cadeiralivre = true;
+				break;
+			}
+			else {
+				cadeiralivre = false;
+			}
+		}
+	}
+}
+
+//Realiza o anuncio do numero sorteado
+void sorteio() {
+	int numsorteado = numSorteado();
+
+	cout << "\n\tSORTEIO\n\nA cadeira sorteada foi: " << numsorteado << "\n\nO participante ganhador foi: \n";
+	for (int i = 0; i < PARTICIPANTES; i++) {
+		if (cliente[i].cadeira == numsorteado) {
+			cout << "\nNome: " << cliente[i].nome << "\nCPF: " << cliente[i].cpf << "\nDeficiente: " << cliente[i].deficiente << "\nProfessor: " << cliente[i].professor << "\nConvidado: " << cliente[i].convidado << "\nCadeira: " << cliente[i].cadeira << "\n";
+		}
+		else {
+			cout << "Cadeira vazia!!";
+			break;;
+		}
+	}
+}
+
+//Realiza o sorteio de um numero de 0 a 99
+int numSorteado() {
+	int ran, menor = 0, maior = PARTICIPANTES;
+	srand((unsigned)time(0)); 
+	ran = rand() % (maior - menor + 1) + menor;//sorteia um numero
+
+	return 0;
+}
+
+//ler a linha oferecida pelo usuario
+int linhaX(){
+   int lin;
+   printf("\n\t          Linha: \n\t"); 
+   scanf("%d",&lin);
+     if(lin>10)
+     {
+       printf("\t\n Esta cadeira nao existe!!! ");
+       }
+   return lin;
+}
+//ler a coluna oferecida pelo usuario
+int colunaY(){
+   int col;
+   printf("\n\t          Coluna: \n\t"); 
+   scanf("%d",&col);
+   if(col>10)
+     {
+       printf("\t\n Esta cadeira nao existe!!! ");
+       }
+   return col;                         
+}
